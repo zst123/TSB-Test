@@ -23,14 +23,15 @@ public class StatusBarLayoutInflationHook extends XC_LayoutInflated {
 		ViewGroup mIconArea = (ViewGroup) liparam.view.findViewById(
 				liparam.res.getIdentifier("system_icon_area", "id", "com.android.systemui"));
 		// find statusbar clock
-		TextView clock = (TextView) mIconArea.findViewById(
+		TextView clock;
+		try {
+		 clock = (TextView) mIconArea.findViewById(
 				liparam.res.getIdentifier("clock", "id", "com.android.systemui"));
+		}catch(Exception e) {
 		// the second attempt
-		if (clock == null) {
 			clock = (TextView) mSbContents.findViewById(
 					liparam.res.getIdentifier("clock", "id", "com.android.systemui"));
 		}
-
 		if (clock != null)
 			mInstance.addTextLabel(clock);
 	}

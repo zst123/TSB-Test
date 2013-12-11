@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
@@ -52,6 +53,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.XC_MethodHook.MethodHookParam;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
@@ -286,6 +288,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 		}
 
 		HtcTransparencyHook.doHook(lpparam.classLoader);
+		hookClock(lpparam);
 	}
 
 	private void setKitKatBatteryColor(int iconColor) {
@@ -494,12 +497,23 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 			mNotificationIconViews.add(imageView);
 	}
 
+	static boolean done;
+	public void hookClock(LoadPackageParam lpparam) {
+		findAndHookMethod("com.android.systemui.statusbar.policy.Clock", lpparam.classLoader, "updateClock", new XC_MethodHook() {
+    		@Override
+    		protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+    			if (done == true) return;
+    			done = true;
+    			addTextLabel((TextView)param.thisObject);
+    		}
+    	});
+	}
 	@Override
 	public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
 		if (!resparam.packageName.equals("com.android.systemui"))
 			return;
 
-		try {
+		/*try {
 			// Before anything else, let's make sure we're not dealing with a Lenovo device
 			// Lenovo is known for doing some deep customizations into UI, so let's just check
 			// if is possible to hook a specific layout and work with it in that case
@@ -512,10 +526,10 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 				layout = Utils.hasGeminiSupport() ? "gemini_super_status_bar" : "super_status_bar";
 			}
 
-			resparam.res.hookLayout("com.android.systemui", "layout", layout, new StatusBarLayoutInflationHook(this));
+			resparam.res.hookLayout("com.android.systemui", "layout", "zzz_status_bar_gemini_cu", new StatusBarLayoutInflationHook(this));
 		} catch (Throwable t) {
 			XposedBridge.log(t);
-		}
+		}*/
 	}
 
 	public int getLastStatusBarTint() {
