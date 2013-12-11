@@ -5,6 +5,9 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 import java.util.ArrayList;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -357,31 +360,19 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 		mLastSetColor = tintColor;
 
 		if (mAnimateStatusBarTintChange) {
-			Animation fadeOutAnimation = AnimationUtils.loadAnimation(mStatusBarView.getContext(),
-					android.R.anim.fade_out);
-			final Animation fadeInAnimation = AnimationUtils.loadAnimation(mStatusBarView.getContext(),
-					android.R.anim.fade_in);
-			fadeOutAnimation.setAnimationListener(new AnimationListener() {
-				@Override
-				public void onAnimationStart(Animation arg0) {}
-				@Override
-				public void onAnimationRepeat(Animation arg0) {}		
-				@Override
-				public void onAnimationEnd(Animation arg0) {
-					if (!mIsStatusBarNowTransparent) {
-						mStatusBarView.setAlpha(1f);
-						if (tintColor == KITKAT_TRANSPARENT_COLOR) {
-							mStatusBarView.setBackgroundColor(KITKAT_TRANSPARENT_COLOR);
-							mStatusBarView.setBackground(new BarBackgroundDrawable(mStatusBarView.getContext(),
-									mResources, R.drawable.status_background));
-						} else {
-							mStatusBarView.setBackgroundColor(tintColor);
-						}
-					}
-					mStatusBarView.startAnimation(fadeInAnimation);
-				}
-			});
-			mStatusBarView.startAnimation(fadeOutAnimation);
+			if (Color.alpha(mLastSetColor) < 230 && (Color.alpha(tintColor) > 230)) {
+				mLastSetColor = Color.BLACK;
+			}
+			final ValueAnimator anim = ValueAnimator.ofObject(new ArgbEvaluator(), mLastSetColor, tintColor);
+			final AnimatorUpdateListener listener = new AnimatorUpdateListener() {
+				@Override 
+				public void onAnimationUpdate(ValueAnimator animator) {
+					mStatusBarView.setBackgroundColor((Integer) animator.getAnimatedValue());
+				} 
+			};
+			anim.addUpdateListener(listener);
+			anim.setDuration(1200);
+			anim.start();
 		} else {
 			mStatusBarView.setAlpha(1f);
 			if (tintColor == KITKAT_TRANSPARENT_COLOR) {
