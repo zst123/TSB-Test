@@ -278,7 +278,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 		new SignalClusterHook(this, lpparam.classLoader);
 		new BluetoothControllerHook(this, lpparam.classLoader);
 		new TickerHooks(this, lpparam.classLoader);
-		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+		if (android.os.Build.VERSION.SDK_INT >= 19) {
 			new KitKatBatteryHook(this, lpparam.classLoader);
 		}
 
@@ -286,7 +286,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 	}
 
 	private void setKitKatBatteryColor(int iconColor) {
-		if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.KITKAT)
+		if (android.os.Build.VERSION.SDK_INT < 19)
 			return;
 		
 		if (mKitKatBatteryView == null)
