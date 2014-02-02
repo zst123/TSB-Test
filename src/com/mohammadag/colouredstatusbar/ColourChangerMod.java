@@ -380,7 +380,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 			mStatusBarView.setAlpha(1f);
 			if (tintColor == KITKAT_TRANSPARENT_COLOR) {
 				mStatusBarView.setBackgroundColor(KITKAT_TRANSPARENT_COLOR);
-				mStatusBarView.setBackground(new BarBackgroundDrawable(mStatusBarView.getContext(),
+				mStatusBarView.setBackgroundDrawable(new BarBackgroundDrawable(mStatusBarView.getContext(),
 						mResources, R.drawable.status_background));
 			} else {
 				mStatusBarView.setBackgroundColor(tintColor);
@@ -454,7 +454,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 				@Override
 				public void onAnimationEnd(Animation arg0) {
 					if (tintColor == KITKAT_TRANSPARENT_COLOR) {
-						view.setBackground(new BarBackgroundDrawable(view.getContext(),
+						view.setBackgroundDrawable(new BarBackgroundDrawable(view.getContext(),
 								mResources, R.drawable.nav_background));
 					} else {
 						view.setBackgroundColor(tintColor);
@@ -465,7 +465,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 			view.startAnimation(fadeOutAnimation);
 		} else {
 			if (tintColor == KITKAT_TRANSPARENT_COLOR) {
-				view.setBackground(new BarBackgroundDrawable(view.getContext(),
+				view.setBackgroundDrawable(new BarBackgroundDrawable(view.getContext(),
 						mResources, R.drawable.nav_background));
 			} else {
 				view.setBackgroundColor(tintColor);
