@@ -6,6 +6,7 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 import java.lang.reflect.Method;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,6 +32,7 @@ public class StatusBarHook {
 					mInstance.setStatusIcons(mStatusIcons);
 					try {
 						View mNavigationBarView = (View) getObjectField(param.thisObject, "mNavigationBarView");
+						mNavigationBarView.setBackgroundColor(Color.TRANSPARENT);
 						mInstance.setNavigationBarView(mNavigationBarView);
 					} catch (NoSuchFieldError e) {}
 				}
