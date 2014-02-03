@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
@@ -59,7 +60,7 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygoteInit, IXposedHookInitPackageResources {
 	private static View mStatusBarView;
-	private static View mNavigationBarView;
+	private static LinearLayout mNavigationBarView;
 	private static View mKitKatBatteryView;
 	private static ArrayList<ImageView> mSystemIconViews = new ArrayList<ImageView>();
 	private static ArrayList<ImageView> mNotificationIconViews = new ArrayList<ImageView>();
@@ -76,7 +77,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 	private static LinearLayout mStatusIcons = null;
 
 	private int mLastSetColor;
-	private static final boolean mAnimateStatusBarTintChange = true;
+	private static final boolean mAnimateStatusBarTintChange = false;
 	private static final int KITKAT_TRANSPARENT_COLOR = Color.parseColor("#66000000");
 
 	/* Wokraround for Samsung UX */
@@ -476,7 +477,21 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 	private void setNavigationBarIconTint(final int tintColor) {
 		if (mNavigationBarView == null)
 			return;
-
+		tintImageViews(mNavigationBarView, tintColor);
+	}
+	
+	private void tintImageViews(ViewGroup statusIcons, int tintColor) {
+		for (int i = 0; i < statusIcons.getChildCount(); i++) {
+			View view = statusIcons.getChildAt(i);
+			if (view == null) {
+				continue;
+			} else if (view instanceof ImageView) {
+				((ImageView)view).setColorFilter(tintColor,
+						mSettingsHelper.getNotificationIconCfType());
+			} else if (view instanceof ViewGroup){
+				tintImageViews((ViewGroup) view, tintColor);
+			}
+		}
 	}
 
 	public void addSystemIconView(ImageView imageView) {
@@ -545,7 +560,7 @@ public class ColourChangerMod implements IXposedHookLoadPackage, IXposedHookZygo
 	}
 
 	public void setNavigationBarView(View navBarView) {
-		mNavigationBarView = navBarView;
+		mNavigationBarView = (LinearLayout) navBarView;
 	}
 
 	public void refreshStatusIconColors() {
